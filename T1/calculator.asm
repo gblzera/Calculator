@@ -16,8 +16,9 @@ section .data
     msg_erro_div db "Erro: Divisao por zero!", 10, 0
     msg_opcao_invalida db "Opcao invalida! Tente novamente.", 10, 0
     
-    fmt_entrada db "%ld", 0
-    fmt_saida db "%ld", 10, 0
+    fmt_entrada_int db "%ld", 0
+    fmt_entrada_float db "%lf", 0
+    fmt_saida_float db "%lf", 10, 0
 
 section .bss
     opcao resq 1
@@ -31,56 +32,47 @@ section .text
     extern scanf
 
 main:
-    ; Preservar registradores base pointer
     push rbp
     mov rbp, rsp
 
 menu:
-    ; Exibir menu (em x86-64, os primeiros argumentos vão para registradores)
     mov rdi, msg_menu
-    xor rax, rax        ; Zero retornos vetoriais para printf
+    xor rax, rax
     call printf
     
-    ; Ler opção do usuário
-    mov rdi, fmt_entrada
+    mov rdi, fmt_entrada_int
     mov rsi, opcao
     xor rax, rax
     call scanf
     
-    ; Verificar opção
     mov rax, [opcao]
     
-    ; Verificar se é opção de saída
     cmp rax, 5
     je fim
     
-    ; Verificar se é opção válida
     cmp rax, 1
     jl opcao_invalida
     cmp rax, 4
     jg opcao_invalida
     
-    ; Ler primeiro número
     mov rdi, msg_num1
     xor rax, rax
     call printf
     
-    mov rdi, fmt_entrada
+    mov rdi, fmt_entrada_float
     mov rsi, num1
     xor rax, rax
     call scanf
     
-    ; Ler segundo número
     mov rdi, msg_num2
     xor rax, rax
     call printf
     
-    mov rdi, fmt_entrada
+    mov rdi, fmt_entrada_float
     mov rsi, num2
     xor rax, rax
     call scanf
     
-    ; Realizar a operação escolhida
     mov rax, [opcao]
     
     cmp rax, 1
@@ -96,34 +88,36 @@ menu:
     je divisao
 
 adicao:
-    mov rax, [num1]
-    add rax, [num2]
-    mov [resultado], rax
-    jmp exibir_resultado
+    fld qword [num1]  ; Carrega num1 na FPU
+    fadd qword [num2] ; Soma num2
+    fstp qword [resultado] ; Armazena o resultado
+    jmp exibir_resultado_float
 
 subtracao:
-    mov rax, [num1]
-    sub rax, [num2]
-    mov [resultado], rax
-    jmp exibir_resultado
+    fld qword [num1]
+    fsub qword [num2]
+    fstp qword [resultado]
+    jmp exibir_resultado_float
 
 multiplicacao:
-    mov rax, [num1]
-    imul rax, [num2]
-    mov [resultado], rax
-    jmp exibir_resultado
+    fld qword [num1]
+    fmul qword [num2]
+    fstp qword [resultado]
+    jmp exibir_resultado_float
 
 divisao:
-    ; Verificar divisão por zero
-    mov rbx, [num2]
-    cmp rbx, 0
+    fld qword [num2]
+    fabs
+    fldz
+    fucompp
+    fstsw ax
+    sahf
     je erro_divisao_zero
     
-    mov rax, [num1]
-    cqo                 ; Estender o sinal de RAX para RDX:RAX (equivalente a cdq em 32-bits)
-    idiv qword [num2]   ; RAX = RDX:RAX / operando
-    mov [resultado], rax
-    jmp exibir_resultado
+    fld qword [num1]
+    fdiv qword [num2]
+    fstp qword [resultado]
+    jmp exibir_resultado_float
 
 erro_divisao_zero:
     mov rdi, msg_erro_div
@@ -131,14 +125,14 @@ erro_divisao_zero:
     call printf
     jmp menu
 
-exibir_resultado:
+exibir_resultado_float:
     mov rdi, msg_resultado
     xor rax, rax
     call printf
     
-    mov rdi, fmt_saida
-    mov rsi, [resultado]
-    xor rax, rax
+    mov rdi, fmt_saida_float
+    mov rax, 1  ; Indica argumento float para printf
+    movq xmm0, [resultado]  ; Carrega resultado em xmm0 para printf
     call printf
     
     jmp menu
@@ -150,8 +144,7 @@ opcao_invalida:
     jmp menu
 
 fim:
-    ; Restaurar registradores e finalizar
     mov rsp, rbp
     pop rbp
-    xor rax, rax        ; Retorno 0 para o sistema operacional
+    xor rax, rax
     ret
