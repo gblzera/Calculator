@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora Científica WebAssembly</title>
+  <script type="module">
+    import Module from './calculadora.js';
+
+    let calc;
+
+    async function inicializar() {
+      const modulo = await Module();
+      calc = new modulo.Calculadora();
+      document.getElementById('log').textContent = "Calculadora pronta!";
+    }
+
+    async function executar(operacao) {
+      const a = parseFloat(document.getElementById('num1').value);
+      const b = parseFloat(document.getElementById('num2').value);
+
+      try {
+        let resultado;
+        switch (operacao) {
+          case 'soma': resultado = calc.soma(a, b); break;
+          case 'sub': resultado = calc.subtracao(a, b); break;
+          case 'mult': resultado = calc.multiplicacao(a, b); break;
+          case 'div': resultado = calc.divisao(a, b); break;
+          case 'pot': resultado = calc.potencia(a, b); break;
+          case 'mod': resultado = calc.modulo(a, b); break;
+          case 'raiz': resultado = calc.raizQuadrada(a); break;
+          case 'log': resultado = calc.logaritmo(a); break;
+          case 'sin': resultado = calc.seno(a); break;
+          case 'cos': resultado = calc.cosseno(a); break;
+        }
+        document.getElementById('resposta').textContent = "Resultado: " + resultado;
+        atualizarHistorico();
+      } catch (e) {
+        document.getElementById('resposta').textContent = "Erro: " + e.message;
+      }
+    }
+
+    function atualizarHistorico() {
+      const historico = calc.getHistorico();
+      const ul = document.getElementById('historico');
+      ul.innerHTML = '';
+      historico.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = entry;
+        ul.appendChild(li);
+      });
+    }
+
+    function limparHistorico() {
+      calc.limparHistorico();
+      atualizarHistorico();
+    }
+
+    window.executar = executar;
+    window.limparHistorico = limparHistorico;
+
+    inicializar();
+  </script>
+</head>
+<body>
+  <h1>Calculadora Científica via WebAssembly</h1>
+
+  <label>Num 1: <input id="num1" type="number" /></label><br>
+  <label>Num 2: <input id="num2" type="number" /></label><br><br>
+
+  <button onclick="executar('soma')">+</button>
+  <button onclick="executar('sub')">-</button>
+  <button onclick="executar('mult')">*</button>
+  <button onclick="executar('div')">/</button>
+  <button onclick="executar('pot')">^</button>
+  <button onclick="executar('mod')">%</button>
+  <button onclick="executar('raiz')">√</button>
+  <button onclick="executar('log')">log10</button>
+  <button onclick="executar('sin')">sin</button>
+  <button onclick="executar('cos')">cos</button>
+  <button onclick="limparHistorico()">Limpar Histórico</button>
+
+  <p id="resposta">Resultado: </p>
+  <p id="log">Carregando módulo...</p>
+
+  <h2>Histórico</h2>
+  <ul id="historico"></ul>
+</body>
+</html>
