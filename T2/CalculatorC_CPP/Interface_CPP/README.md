@@ -14,10 +14,12 @@ Este projeto é uma calculadora científica com interface gráfica desenvolvida 
 ## 📂 Estrutura do Projeto
 
 ```
-├── calculator.h           # Classe com as funções matemáticas
-├── calculadora_gui.cpp    # Implementação da GUI e lógica da calculadora
-├── makefile               # Script para compilação
-└── README.md              # Este arquivo
+├── calculator.h                # Classe com as funções matemáticas
+├── calculator.cpp              # Classe com as operações
+├── calculadora_gui.cpp         # Implementação da GUI e lógica da calculadora
+├── makefile                    # Script para compilação
+├── install_dependencies.sh     # Script de instalação das dependencias do projeto
+└── README.md                   # Este arquivo
 ```
 
 ## 🧑‍💻 Dependências
