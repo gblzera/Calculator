@@ -1,6 +1,6 @@
-# 🔢 Comparação de Paradigmas: Calculadoras Funcional (Haskell) e Lógico (Prolog / MiniKanren)
+# 🔢 Comparação de Paradigmas: Calculadoras Funcional (Haskell) e Lógico (Prolog)
 
-Este projeto tem como objetivo comparar **paradigmas de programação** através da implementação de **calculadoras** nas linguagens **Haskell (funcional)**, **Prolog (lógica)** e um experimento bônus com **MiniKanren**.
+Este projeto tem como objetivo comparar **paradigmas de programação** através da implementação de **calculadoras** nas linguagens **Haskell (funcional)** e **Prolog (lógica)**.
 
 Ele serve como estudo prático das diferenças entre esses paradigmas, focando em **sintaxe, modelo de execução, clareza, modularidade** e **facilidade de implementação de lógica matemática**.
 
@@ -21,12 +21,6 @@ Ele serve como estudo prático das diferenças entre esses paradigmas, focando e
 - Execução por unificação e backtracking
 - Natural para problemas declarativos
 
-### 🧪 Experimental — MiniKanren
-
-- DSL lógica em Scheme/Lisp
-- Menos prática, mais exploratória
-- Ideal para entender lógica relacional
-
 ---
 
 ## 🧮 Funcionalidades
@@ -41,7 +35,6 @@ Cada calculadora implementa:
 Extras por linguagem:
 - Haskell: suporte a expressões aninhadas e operadores personalizados
 - Prolog: avaliação por regras e inferência
-- MiniKanren: lógica relacional experimental com foco em reversibilidade
 
 ---
 
@@ -53,9 +46,7 @@ calculadoras/
 │   ├── Calculator.hs             # Módulo principal da calculadora funcional
 │   └── Main.hs                   # Entrada principal com parsing e execução
 ├── prolog_calculator/
-│   └── calculator.pl             # Fatos, regras e avaliador lógico
-├── minikanren_calculator/
-│   └── calculator.scm            # Implementação relacional em Scheme com MiniKanren
+│   └── calculator.pl             # Fatos, regras e avaliador lógica
 └── README.md                     # Este arquivo
 ```
 
@@ -81,16 +72,6 @@ sudo apt install haskell-platform
 sudo apt install swi-prolog
 ```
 
-### MiniKanren
-
-- [Racket](https://racket-lang.org/) ou [ChezScheme](https://cisco.github.io/ChezScheme/)
-- Clonar a lib MiniKanren do GitHub
-
-```bash
-sudo apt install racket
-git clone https://github.com/miniKanren/miniKanren.git
-```
-
 ---
 
 ## ⚙️ Execução
@@ -109,24 +90,17 @@ cd prolog_calculator
 swipl -s calculator.pl
 ```
 
-### MiniKanren (Racket)
-
-```bash
-cd minikanren_calculator
-racket calculator.scm
-```
-
 ---
 
 ## 📊 Comparação entre os Paradigmas
 
-| Critério               | Haskell                    | Prolog                      | MiniKanren                 |
-|------------------------|----------------------------|-----------------------------|----------------------------|
-| Modelo de Execução     | Avaliação de expressões    | Resolução lógica (regras)   | Lógica relacional          |
-| Sintaxe                | Funcional, tipada          | Declarativa, baseada em fatos e regras | Lisp-like (Scheme)       |
-| Curva de Aprendizado   | Alta                       | Alta                        | Altíssima (experimental)   |
-| Facilidade com expressões | Alta com parser combinators | Média (requere modelagem lógica) | Baixa (mais teórico)      |
-| Suporte/Ferramentas    | Forte                      | Forte                       | Fraco                      |
+| Critério               | Haskell                    | Prolog                      | 
+|------------------------|----------------------------|-----------------------------|
+| Modelo de Execução     | Avaliação de expressões    | Resolução lógica (regras)   | 
+| Sintaxe                | Funcional, tipada          | Declarativa, baseada em fatos e regras | 
+| Curva de Aprendizado   | Alta                       | Alta                        | 
+| Facilidade com expressões | Alta com parser combinators | Média (requere modelagem lógica) | 
+| Suporte/Ferramentas    | Forte                      | Forte                       | 
 
 ---
 
@@ -145,4 +119,3 @@ Este projeto serve como base para:
 
 - [Learn You a Haskell for Great Good!](http://learnyouahaskell.com/)
 - [SWI-Prolog Documentation](https://www.swi-prolog.org/pldoc/)
-- [The Reasoned Schemer (MiniKanren)](https://mitpress.mit.edu/9780262565494/)
