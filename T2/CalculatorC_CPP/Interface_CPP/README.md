@@ -26,7 +26,9 @@ Este projeto é uma calculadora científica com interface gráfica desenvolvida 
 
 - **C++17** ou superior
 - **GTKmm 4**
-
+```bash
+wsl.exe -d Ubuntu -- bash install_dependencies.sh
+```
 Para instalar o GTKmm 4 no Ubuntu/Debian:
 
 ```bash
