@@ -36,4 +36,20 @@ Este repositório contém códigos e explicações referentes aos trabalhos da d
 
 ---
 
+## 📌 Trabalho do Terceiro Bimestre  
+
+📢 **Tema:** Comparação do Paradigma Funcional e Lógico  
+
+🗓 **Entrega e apresentação:** A ser definida 
+
+🔍 **Descrição:**  
+Neste trabalho, o foco foi realizar uma análise comparativa entre os paradigmas **funcional** e **lógico**, destacando suas características principais, vantagens, desvantagens e exemplos práticos de aplicação. O objetivo foi compreender melhor como esses paradigmas se diferenciam do paradigma imperativo abordado nos trabalhos anteriores, e refletir sobre suas implicações no desenvolvimento de software.  
+
+⚙ **Atividades realizadas:**  
+- Estudo teórico sobre paradigmas funcional e lógico  
+- Exemplos de códigos representativos em linguagens que adotam esses paradigmas  
+- Discussão crítica sobre a aplicabilidade e impacto desses paradigmas na programação contemporânea  
+
+---
+
 📢 *Este repositório será atualizado conforme o progresso dos projetos.* 🚀
