@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadoras: Paradigmas Funcional vs Lógico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            width: 90%;
+            max-width: 1200px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h3 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #ffed4e;
+            border-bottom: 2px solid rgba(255, 237, 78, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h4 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 12px;
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        li::before {
+            content: "▶";
+            color: #ffd700;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 215, 0, 0.2);
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ffd700;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 215, 0, 0.1) 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #ffd700;
+            margin: 20px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: scale(1.05);
+        }
+
+        .vs-divider {
+            text-align: center;
+            font-size: 3em;
+            margin: 20px 0;
+            color: #ffd700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- title -->
+        <div class="slide active">
+            <h1>🔢 Calculadoras</h1>
+            <div class="subtitle">Comparação entre Paradigmas Funcional e Lógico</div>
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">🔷</span> Haskell (Funcional)</h4>
+                    <p>Programação funcional pura com imutabilidade e avaliação preguiçosa</p>
+                </div>
+                <div class="card">
+                    <h4><span class="emoji">🔶</span> Prolog (Lógico)</h4>
+                    <p>Baseado em lógica de predicados com fatos, regras e backtracking</p>
+                </div>
+            </div>
+            <div class="highlight">
+                <p><strong>Objetivo:</strong> Demonstrar como diferentes paradigmas abordam o mesmo problema computacional</p>
+            </div>
+        </div>
+        
+        <!-- agenda -->
+        <div class="slide">
+            <h2>📋 Agenda</h2>
+            <ul>
+                <li>O que são Paradigmas de Programação?</li>
+                <li>Haskell - Paradigma Funcional</li>
+                <li>Prolog - Paradigma Lógico</li>
+                <li>Comparação Técnica</li>
+                <li>Implementações e Demonstração de Uso</li>
+                <li>Vantagens e Desvantagens</li>
+                <li>Conclusões e Perguntas</li>
+            </ul>
+        </div>
+
+        <!-- what are paradigms -->
+        <div class="slide">
+            <h2>🧠 O que são Paradigmas de Programação?</h2>
+            <div class="highlight">
+                <p><strong>Paradigma de Programação</strong> é um estilo fundamental de programação que fornece e determina a visão que o programador possui sobre a estruturação e execução do programa.</p>
+            </div>
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">🔷</span> Paradigma Funcional</h4>
+                    <ul>
+                        <li>Baseado em funções matemáticas</li>
+                        <li>Imutabilidade de dados</li>
+                        <li>Ausência de efeitos colaterais</li>
+                        <li>Avaliação de expressões</li>
+                        <li>Recursão como estrutura de controle</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4><span class="emoji">🔶</span> Paradigma Lógico</h4>
+                    <ul>
+                        <li>Baseado em lógica de predicados</li>
+                        <li>Declaração de fatos e regras</li>
+                        <li>Resolução por unificação</li>
+                        <li>Backtracking automático</li>
+                        <li>Inferência lógica</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- haskell -->
+        <div class="slide">
+            <h2>🔷 Haskell - Paradigma Funcional</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h4>🎯 Tipagem Forte</h4>
+                    <p>Sistema de tipos avançado com inferência automática</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🔄 Imutabilidade</h4>
+                    <p>Dados não podem ser modificados após criação</p>
+                </div>
+                <div class="feature-item">
+                    <h4>⚡ Lazy Evaluation</h4>
+                    <p>Avaliação preguiçosa - valores computados apenas quando necessários</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🧮 Funções Puras</h4>
+                    <p>Sem efeitos colaterais, mesma entrada = mesma saída</p>
+                </div>
+            </div>
+            <div class="code-block">
+                <strong>Exemplo da estrutura de dados:</strong><br>
+                data Expr = Val Double | Add Expr Expr | Sub Expr Expr<br>
+                eval :: Expr -> Maybe Double<br>
+                eval (Add x y) = (+) &lt;$&gt; eval x &lt;*&gt; eval y
+            </div>
+        </div>
+
+        <!-- prolog -->
+        <div class="slide">
+            <h2>🔶 Prolog - Paradigma Lógico</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h4>📋 Fatos e Regras</h4>
+                    <p>Programa consiste em declarações lógicas</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🔍 Unificação</h4>
+                    <p>Processo de matching entre termos</p>
+                </div>
+                <div class="feature-item">
+                    <h4>↩️ Backtracking</h4>
+                    <p>Busca automática por soluções alternativas</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🎯 Declarativo</h4>
+                    <p>Você declara O QUE quer, não COMO fazer</p>
+                </div>
+            </div>
+            <div class="code-block">
+                <strong>Exemplo da implementação:</strong><br>
+                handle_input(Input) :-<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;catch(Result is Input, _, write('Erro: expressão inválida')), !,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;write('Resultado> '), write(Result), nl,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;start.
+            </div>
+        </div>
+
+        <!-- technical comparison -->
+        <div class="slide">
+            <h2>⚖️ Comparação Técnica</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Critério</th>
+                        <th>🔷 Haskell</th>
+                        <th>🔶 Prolog</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Modelo de Execução</strong></td>
+                        <td>Avaliação de expressões funcionais</td>
+                        <td>Resolução lógica por regras</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estrutura de Dados</strong></td>
+                        <td>Tipos algébricos (ADT)</td>
+                        <td>Termos e átomos</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tratamento de Erros</strong></td>
+                        <td>Maybe/Either (type-safe)</td>
+                        <td>Exception handling com catch</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Parsing</strong></td>
+                        <td>Parser combinators complexos</td>
+                        <td>Built-in com operador 'is'</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Curva de Aprendizado</strong></td>
+                        <td>Alta (conceitos matemáticos)</td>
+                        <td>Alta (pensamento lógico)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- implementations -->
+        <div class="slide">
+            <h2>🛠️ Como Cada Uma Funciona</h2>
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">🔷</span> Calculadora Haskell</h4>
+                    <ul>
+                        <li><strong>Parser:</strong> Analisa string em árvore sintática</li>
+                        <li><strong>AST:</strong> Representa expressão como estrutura de dados</li>
+                        <li><strong>Evaluator:</strong> Percorre árvore recursivamente</li>
+                        <li><strong>Safety:</strong> Maybe para tratar divisão por zero</li>
+                        <li><strong>REPL:</strong> Loop interativo no terminal</li>
+                    </ul>
+                    <div class="code-block">
+                        Exemplo: "2 + 3 * 4"<br>
+                        → Add (Val 2) (Mul (Val 3) (Val 4))<br>
+                        → eval → Just 14.0
+                    </div>
+                </div>
+                <div class="card">
+                    <h4><span class="emoji">🔶</span> Calculadora Prolog</h4>
+                    <ul>
+                        <li><strong>Fatos:</strong> Definições básicas do sistema</li>
+                        <li><strong>Regras:</strong> Como processar entrada do usuário</li>
+                        <li><strong>Built-in 'is':</strong> Avaliação matemática nativa</li>
+                        <li><strong>Catch:</strong> Tratamento de erros</li>
+                        <li><strong>Recursão:</strong> Loop através de backtracking</li>
+                    </ul>
+                    <div class="code-block">
+                        Exemplo: "2 + 3 * 4"<br>
+                        → Result is 2 + 3 * 4<br>
+                        → Prolog avalia → Result = 14
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- advantages and disadvantages -->
+        <div class="slide">
+            <h2>⚡ Vantagens e Desvantagens</h2>
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">🔷</span> Haskell</h4>
+                    <h5 style="color: #90EE90; margin-top: 20px;">✅ Vantagens:</h5>
+                    <ul>
+                        <li>Controle total sobre parsing e estrutura</li>
+                        <li>Type safety elimina muitos bugs</li>
+                        <li>Modularidade e reutilização de código</li>
+                        <li>Expressividade matemática natural</li>
+                    </ul>
+                    <h5 style="color: #FFB6C1; margin-top: 20px;">❌ Desvantagens:</h5>
+                    <ul>
+                        <li>Curva de aprendizado íngreme</li>
+                        <li>Mais código para funcionalidade básica</li>
+                        <li>Complexidade do parser combinators</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4><span class="emoji">🔶</span> Prolog</h4>
+                    <h5 style="color: #90EE90; margin-top: 20px;">✅ Vantagens:</h5>
+                    <ul>
+                        <li>Implementação extremamente concisa</li>
+                        <li>Avaliação matemática built-in</li>
+                        <li>Natural para problemas lógicos</li>
+                        <li>Backtracking automático</li>
+                    </ul>
+                    <h5 style="color: #FFB6C1; margin-top: 20px;">❌ Desvantagens:</h5>
+                    <ul>
+                        <li>Menos controle sobre o processo</li>
+                        <li>Debugging pode ser complexo</li>
+                        <li>Limitado para alguns tipos de problemas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- usage demonstration -->
+        <div class="slide">
+            <h2>🎯 Demonstração de Uso</h2>
+            <div class="grid">
+                <div class="card">
+                    <h4><span class="emoji">🔷</span> Executando Haskell</h4>
+                    <div class="code-block">
+                        $ ./script_h.sh<br>
+                        $ ./calc<br><br>
+                        Digite uma expressão:<br>
+                        > 4 + 2 * (3 - 1)<br>
+                        Resultado: 8.0<br><br>
+                        > 10 / 0<br>
+                        Erro: divisão por zero!<br><br>
+                        > sair<br>
+                        👋 Encerrando a calculadora
+                    </div>
+                </div>
+                <div class="card">
+                    <h4><span class="emoji">🔶</span> Executando Prolog</h4>
+                    <div class="code-block">
+                        $ swipl<br>
+                        ?- [calculator].<br>
+                        ?- start.<br><br>
+                        Digite uma expressão:<br>
+                        > 4 + 2 * (3 - 1).<br>
+                        Resultado> 8<br><br>
+                        > 10 / 0.<br>
+                        Erro: divisão por zero<br><br>
+                        > sair.<br>
+                        👋 Encerrando a calculadora
+                    </div>
+                </div>
+            </div>
+            <div class="highlight">
+                <p><strong>Observação:</strong> Note que o Prolog exige o ponto final (.) em cada entrada!</p>
+            </div>
+        </div>
+
+        <!-- conclusions -->
+        <div class="slide">
+            <h2>🎓 Conclusões</h2>
+            <div class="highlight">
+                <h3>💡 O que aprendemos?</h3>
+                <p>Diferentes paradigmas oferecem perspectivas únicas para resolver o mesmo problema</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-item">
+                    <h4>🔷 Funcional</h4>
+                    <p><strong>Ideal para:</strong> Sistemas complexos, type safety, modularidade</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🔶 Lógico</h4>
+                    <p><strong>Ideal para:</strong> Problemas declarativos, inferência, prototipagem rápida</p>
+                </div>
+            </div>
+
+            <div class="vs-divider">⚖️</div>
+
+            <div class="highlight">
+                <h3>🚀 Takeaway Principal</h3>
+                <p>"Não é só sobre fazer contas. É sobre <strong>como</strong> você faz contas em diferentes universos de pensamento computacional."</p>
+            </div>
+
+            <div class="card" style="margin-top: 30px;">
+                <h4>🎯 Escolha do Paradigma</h4>
+                <p>A escolha entre paradigmas depende do problema, contexto, equipe e requisitos do projeto. Cada um tem seu lugar na programação!</p>
+            </div>
+        </div>
+
+        <!-- questions -->
+        <div class="slide">
+            <h2>❓ Perguntas?</h2>
+            <div style="text-align: center; margin-top: 100px;">
+                <div style="font-size: 6em; margin-bottom: 40px;">🤔</div>
+                <div style="font-size: 2em; margin-bottom: 40px;">
+                    Alguma dúvida sobre os paradigmas<br>
+                    Funcional e Lógico?
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <h4>📚 Quer se aprofundar?</h4>
+                        <p>Explore materiais extras, desafios e comparações entre os paradigmas</p>
+                    </div>
+                    <div class="card">
+                        <h4>💻 Código Fonte</h4>
+                        <p>
+                            <a href="https://github.com/gblzera/Calculator/tree/master/T3/calculadoras" target="_blank">
+                             Acesse o repositório no GitHub e veja como tudo foi implementado
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">10</span>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Próximo →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('total-slides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = n + 1;
+            document.getElementById('prev-btn').disabled = n === 0;
+            document.getElementById('next-btn').disabled = n === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                currentSlide = newSlide;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Navegação por teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        // Inicializar
+        showSlide(0);
+    </script>
+</body>
+</html>
